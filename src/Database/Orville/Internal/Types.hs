@@ -3,6 +3,7 @@ Module    : Database.Orville.Internal.Types
 Copyright : Flipstone Technology Partners 2016-2018
 License   : MIT
 -}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -16,8 +17,11 @@ import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Writer
 import qualified Data.List as List
-import Data.Typeable
 import Database.HDBC
+
+#if __GLASGOW_HASKELL__ < 802
+  import Data.Typeable
+#endif
 
 import qualified Data.Time as Time
 
@@ -115,7 +119,11 @@ say msg msgDate commenter =
 data FromSqlError
   = RowDataError String
   | QueryError String
+#if __GLASGOW_HASKELL__ < 802
   deriving (Show, Typeable)
+#else
+  deriving (Show)
+#endif
 
 instance Exception FromSqlError
 

@@ -3,6 +3,7 @@ module Main where
 import Control.Arrow
 import Control.Exception
 import Control.Monad (void)
+import Control.Monad.Fail
 import Data.Convertible (convert)
 import qualified Data.Map.Strict as Map
 import Data.Text (pack, unpack)
@@ -279,7 +280,7 @@ getStudentsByMajorId = O.hasMany studentTable studentMajorField
 majorIdPopper :: O.Popper (Major MajorId) (MajorId)
 majorIdPopper = O.fromKern majorId
 
-resetToBlankSchema :: O.MonadOrville conn m => O.SchemaDefinition -> m ()
+resetToBlankSchema :: (MonadFail m, O.MonadOrville conn m) => O.SchemaDefinition -> m ()
 resetToBlankSchema schemaDef = do
   results <- ORaw.selectSqlRows "SELECT current_user" []
   case results of

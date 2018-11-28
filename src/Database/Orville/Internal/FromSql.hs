@@ -73,6 +73,7 @@ instance ColumnSpecifier LBS.ByteString where
 
 type ResultSet = [[(String, SqlValue)]]
 
+{-# INLINEABLE decodeSqlRows #-}
 decodeSqlRows ::
      MonadOrville conn m => FromSql result -> ResultSet -> m [result]
 decodeSqlRows builder rows =

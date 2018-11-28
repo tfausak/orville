@@ -14,6 +14,7 @@ import Control.Applicative
 import Control.Monad.Base
 import Control.Monad.Catch (MonadCatch, MonadMask(..), MonadThrow)
 import Control.Monad.Except
+import Control.Monad.Fail
 import Control.Monad.Reader (ReaderT(..), ask, local, mapReaderT, runReaderT)
 import Control.Monad.State (StateT, mapStateT)
 import Data.Pool
@@ -111,10 +112,10 @@ newtype OrvilleT conn m a = OrvilleT
              , MonadThrow
              , MonadCatch
              , MonadMask
+             , MonadFail
              )
 
-mapOrvilleT ::
-     Monad n => (m a -> n b) -> OrvilleT conn m a -> OrvilleT conn n b
+mapOrvilleT :: (m a -> n b) -> OrvilleT conn m a -> OrvilleT conn n b
 mapOrvilleT f (OrvilleT action) = OrvilleT $ mapReaderT f action
 
 runOrville :: OrvilleT conn m a -> OrvilleEnv conn -> m a
@@ -123,6 +124,7 @@ runOrville = runReaderT . unOrvilleT
 newConnectionEnv :: conn -> ConnectionEnv conn
 newConnectionEnv = ConnectionEnv False
 
+{-# INLINEABLE withConnectionEnv #-}
 withConnectionEnv :: MonadOrville conn m => (ConnectionEnv conn -> m a) -> m a
 withConnectionEnv action = do
   ormEnv <- getOrvilleEnv
@@ -284,7 +286,6 @@ instance MonadOrvilleControl m => MonadOrvilleControl (ReaderT a m) where
 instance ( Monad m
          , MonadThrow m
          , MonadIO m
-         , IConnection conn
          , MonadOrville conn m
          ) =>
          MonadOrville conn (ReaderT a m)

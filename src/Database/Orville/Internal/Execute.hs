@@ -10,6 +10,7 @@ import Database.HDBC hiding (withTransaction)
 
 import Database.Orville.Internal.Monad
 
+{-# INLINEABLE executingSql #-}
 executingSql :: MonadOrville conn m => QueryType -> String -> IO a -> m a
 executingSql queryType sql action = do
   runningQuery <- ormEnvRunningQuery <$> getOrvilleEnv

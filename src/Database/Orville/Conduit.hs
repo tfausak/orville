@@ -46,7 +46,7 @@ import Database.Orville.Internal.Types
 -- are read and executed at the appropriate times.
 --
 selectConduit ::
-     (Monad m, MonadOrville conn m, MonadCatch m) => Select row -> Source m row
+     (MonadOrville conn m, MonadCatch m) => Select row -> Source m row
 selectConduit select = do
   pool <- ormEnvPool <$> lift getOrvilleEnv
   cleanupRef <- liftIO $ newIORef (pure ())
@@ -71,7 +71,7 @@ selectConduit select = do
   runFinish
   pure $ result
 
-feedRows :: (Monad m, MonadIO m) => FromSql row -> Statement -> Source m row
+feedRows :: ( MonadIO m) => FromSql row -> Statement -> Source m row
 feedRows builder query = do
   row <- liftIO $ fetchRowAL query
   case runFromSql builder <$> row of

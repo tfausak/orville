@@ -8,10 +8,18 @@ License   : MIT
 
 module Database.Orville.Internal.SelectOptions where
 
+#if 800 < __GLASGOW_HASKELL__ < 804
+import Data.Semigroup (Semigroup((<>)))
+#endif
+
 import Data.Convertible
 import qualified Data.List as List
 import Data.Maybe
+#if 800 < __GLASGOW_HASKELL__
+import Data.Monoid hiding ((<>))
+#else
 import Data.Monoid
+#endif
 import Database.HDBC
 
 import Database.Orville.Internal.FieldDefinition ()
@@ -36,14 +44,18 @@ selectOptLimitSql = fmap convert . getFirst . selectOptLimit
 selectOptOffsetSql :: SelectOptions -> Maybe SqlValue
 selectOptOffsetSql = fmap convert . getFirst . selectOptOffset
 
-#if MIN_VERSION_base(4,11,0)
+#if 800 < __GLASGOW_HASKELL__
 instance Semigroup SelectOptions where
   (<>) = appendSelectOptions
 #endif
 
 instance Monoid SelectOptions where
   mempty = SelectOptions mempty mempty mempty mempty mempty mempty
+#if 800 < __GLASGOW_HASKELL__
+  mappend = (<>)
+#else
   mappend = appendSelectOptions
+#endif
 
 appendSelectOptions :: SelectOptions -> SelectOptions -> SelectOptions
 appendSelectOptions opt opt' =

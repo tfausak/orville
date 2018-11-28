@@ -7,7 +7,13 @@ License   : MIT
 
 module Database.Orville.Internal.QueryKey where
 
+#if 800 < __GLASGOW_HASKELL__ < 804
+import Data.Semigroup
+#endif
+
+#if __GLASGOW_HASKELL__ < 800
 import Data.Monoid
+#endif
 import Data.Time.LocalTime
 import Database.HDBC
 
@@ -21,14 +27,18 @@ data QueryKey
   | QKEmpty
   deriving (Eq, Ord)
 
-#if MIN_VERSION_base(4,11,0)
+#if 800 < __GLASGOW_HASKELL__
 instance Semigroup QueryKey where
   (<>) = appendQueryKeys
 #endif
 
 instance Monoid QueryKey where
   mempty = QKEmpty
+#if 800 < __GLASGOW_HASKELL__
+  mappend = (<>)
+#else
   mappend = appendQueryKeys
+#endif
   mconcat = QKList
 
 appendQueryKeys :: QueryKey -> QueryKey -> QueryKey

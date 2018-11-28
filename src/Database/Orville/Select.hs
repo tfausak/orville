@@ -28,6 +28,7 @@ import Database.Orville.Internal.FromSql
 import Database.Orville.Internal.Monad
 import Database.Orville.Internal.Select
 
+{-# INLINEABLE runSelect #-}
 runSelect :: MonadOrville conn m => Select row -> m [row]
 runSelect select = do
   rows <-

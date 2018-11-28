@@ -14,6 +14,7 @@ import Control.Concurrent (threadDelay)
 import qualified Control.Exception as Exc
 import Control.Monad
 import Control.Monad.Catch
+import Control.Monad.Fail (MonadFail)
 import Control.Monad.IO.Class
 import Data.Int
 import Data.Monoid
@@ -59,7 +60,7 @@ waitForLockExpr =
 lockResult :: FromSql Bool
 lockResult = col ("result" :: String)
 
-withLockedTransaction :: (MonadOrville conn m, MonadThrow m) => m a -> m a
+withLockedTransaction :: (MonadFail m, MonadOrville conn m, MonadThrow m) => m a -> m a
 withLockedTransaction action = do
   go (0 :: Int)
   where
@@ -98,7 +99,7 @@ withLockedTransaction action = do
    explicitly states that the items are safe to drop. Column types may be changed,
    but will fail if the database cannot successfully make the request type change.
   -}
-migrateSchema :: MonadOrville conn m => SchemaDefinition -> m ()
+migrateSchema :: (MonadFail m, MonadOrville conn m) => SchemaDefinition -> m ()
 migrateSchema schemaDef =
   withConnection $ \conn -> do
     withLockedTransaction $ do
@@ -115,7 +116,7 @@ migrateSchema schemaDef =
    definition, Nothing will be returned.
  -}
 generateMigrationPlan ::
-     MonadOrville conn m => SchemaDefinition -> m (Maybe MigrationPlan)
+     (MonadFail m, MonadOrville conn m) => SchemaDefinition -> m (Maybe MigrationPlan)
 generateMigrationPlan schemaDef =
   withConnection $ \conn -> do
     withLockedTransaction $ do

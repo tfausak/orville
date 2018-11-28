@@ -98,7 +98,7 @@ findRecordsCached tableDef keys = do
   pure $ Map.fromList (map mkEntry recordList)
 
 findRecordCached ::
-     (MonadThrow m, MonadOrville conn m)
+     (MonadOrville conn m)
   => TableDefinition readEntity writeEntity key
   -> key
   -> QueryCached m (Maybe readEntity)

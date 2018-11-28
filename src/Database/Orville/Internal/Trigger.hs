@@ -170,7 +170,7 @@ instance MonadIO m =>
       recordedTriggers <- ask
       liftIO $ recordTriggers recordedTriggers triggers
 
-instance (Monad m, O.MonadOrvilleControl m) =>
+instance (O.MonadOrvilleControl m) =>
          O.MonadOrvilleControl (OrvilleTriggerT trigger conn m) where
   liftWithConnection = O.defaultLiftWithConnection OrvilleTriggerT unTriggerT
   liftFinally = O.defaultLiftFinally OrvilleTriggerT unTriggerT

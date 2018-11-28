@@ -15,6 +15,7 @@ groupBy keyFunc = groupBy' mkEntry
   where
     mkEntry a = (keyFunc a, a)
 
+{-# INLINEABLE groupBy' #-}
 groupBy' :: Ord k => (a -> (k, v)) -> [a] -> Map.Map k [v]
 groupBy' mkEntry as = Map.fromListWith (++) (map mkListEntry as)
   where

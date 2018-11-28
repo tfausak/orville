@@ -171,6 +171,7 @@ hasManyInWhere ::
 hasManyInWhere tableDef fieldDef opts =
   PopPrim (PrimRecordsManyBy tableDef fieldDef opts)
 
+{-# INLINEABLE hasOne #-}
 hasOne ::
      Ord fieldValue
   => TableDefinition readEntity writeEntity key
@@ -413,6 +414,7 @@ instance Arrow Popper where
 instance ArrowChoice Popper where
   left = PopArrowLeft
 
+{-# INLINEABLE popThrow #-}
 popThrow :: MonadOrville conn m => Popper a b -> a -> m b
 popThrow popper a = do
   popped <- pop popper a

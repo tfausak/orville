@@ -201,6 +201,7 @@ selectAll ::
   -> m [readEntity]
 selectAll tableDef = runSelect . selectQueryTable tableDef
 
+{-# INLINEABLE selectFirst #-}
 selectFirst ::
      MonadOrville conn m
   => TableDefinition readEntity writeEntity key
@@ -209,6 +210,7 @@ selectFirst ::
 selectFirst tableDef opts =
   listToMaybe <$> selectAll tableDef (limit 1 <> opts)
 
+{-# INLINEABLE deleteWhereBuild #-}
 deleteWhereBuild ::
      MonadOrville conn m
   => TableDefinition readEntity writeEntity key
@@ -222,6 +224,7 @@ deleteWhereBuild tableDef conds = do
   withConnection $ \conn -> do
     executingSql DeleteQuery querySql $ do run conn querySql values
 
+{-# INLINEABLE deleteWhere #-}
 deleteWhere ::
      MonadOrville conn m
   => TableDefinition readEntity writeEntity key
@@ -229,6 +232,7 @@ deleteWhere ::
   -> m Integer
 deleteWhere tableDef = deleteWhereBuild tableDef
 
+{-# INLINEABLE findRecords #-}
 findRecords ::
      (Ord key, MonadOrville conn m)
   => TableDefinition readEntity writeEntity key
@@ -241,6 +245,7 @@ findRecords tableDef keys = do
   recordList <- selectAll tableDef (where_ $ keyField .<- keys)
   pure $ Map.fromList (map mkEntry recordList)
 
+{-# INLINEABLE findRecordsBy #-}
 findRecordsBy ::
      (Ord fieldValue, MonadOrville conn m)
   => TableDefinition readEntity writeEntity key
@@ -252,6 +257,7 @@ findRecordsBy tableDef field opts = do
       query = selectQuery builder (fromClauseTable tableDef) opts
   Map.groupBy' id <$> runSelect query
 
+{-# INLINEABLE findRecord #-}
 findRecord ::
      MonadOrville conn m
   => TableDefinition readEntity writeEntity key
@@ -261,6 +267,7 @@ findRecord tableDef key =
   let keyField = tablePrimaryKey tableDef
    in selectFirst tableDef (where_ $ keyField .== key)
 
+{-# INLINEABLE updateFields #-}
 updateFields ::
      MonadOrville conn m
   => TableDefinition readEntity writeEntity key
@@ -318,6 +325,7 @@ insertRecord tableDef newRecord = do
     [] -> error "Didn't get a record back from the database!"
     _ -> error "Got more than one record back from the database!"
 
+{-# INLINEABLE insertRecordMany #-}
 insertRecordMany ::
      MonadOrville conn m
   => TableDefinition readEntity writeEntity key
@@ -334,6 +342,7 @@ insertRecordMany tableDef newRecords = do
       insert <- prepare conn insertSql
       executeMany insert (map (runToSql builder) newRecords)
 
+{-# INLINEABLE deleteRecord #-}
 deleteRecord ::
      MonadOrville conn m
   => TableDefinition readEntity writeEntity key

@@ -7,6 +7,10 @@ License   : MIT
 
 module Database.Orville.Internal.Expr.Expr where
 
+#if 800 < __GLASGOW_HASKELL__ < 804
+import Data.Semigroup
+#endif
+
 import Data.String
 
 data RawExpr
@@ -25,14 +29,18 @@ rawExprToSql = go ""
     go rest (RawExprAppend r1 r2) = go (go rest r2) r1
     go rest (RawExprConcat exprs) = foldr (flip go) rest exprs
 
-#if MIN_VERSION_base(4,11,0)
+#if 800 < __GLASGOW_HASKELL__
 instance Semigroup RawExpr where
   (<>) = RawExprAppend
 #endif
 
 instance Monoid RawExpr where
   mempty = RawExprString ""
+#if 800 < __GLASGOW_HASKELL__
+  mappend = (<>)
+#else
   mappend = RawExprAppend
+#endif
   mconcat = RawExprConcat
 
 instance IsString RawExpr where

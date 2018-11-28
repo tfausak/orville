@@ -36,6 +36,7 @@ selectSql ::
   -> m [result]
 selectSql sql values builder = runSelect $ selectQueryRaw builder sql values
 
+{-# INLINEABLE updateSql #-}
 updateSql :: MonadOrville conn m => String -> [SqlValue] -> m Integer
 updateSql sql values =
   withConnection $ \conn -> do

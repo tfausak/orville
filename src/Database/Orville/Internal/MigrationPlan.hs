@@ -13,6 +13,10 @@ module Database.Orville.Internal.MigrationPlan
   , migrationPlanItems
   ) where
 
+#if 800 < __GLASGOW_HASKELL__ < 804
+import Data.Semigroup
+#endif
+
 import qualified Data.DList as DList
 
 import Database.Orville.Internal.Types (SchemaItem)
@@ -40,10 +44,12 @@ migrationPlanItems :: MigrationPlan -> [MigrationItem]
 migrationPlanItems (MigrationPlan item rest) =
   DList.toList $ DList.cons item rest
 
-#if MIN_VERSION_base(4,11,0)
+#if 800 < __GLASGOW_HASKELL__
 instance Semigroup MigrationPlan where
   (<>) = append
-#else
+#endif
+-- GHC 8.2.2 unfortunately needs both to avoid (some) warnings :(
+#if __GLASGOW_HASKELL__ < 804
 instance Monoid MigrationPlan
   -- MigrationPlan doesn't support mempty, so don't provide a Monoid instance for
   -- base versions that have migrated to Semigroup.

@@ -1,10 +1,14 @@
+{-# LANGUAGE CPP #-}
 module Database.Orville.Internal.MigrationError
   ( MigrationError(..)
   ) where
 
 import Control.Exception (Exception, SomeException, displayException)
 import qualified Data.List as List
-import Data.Typeable (Typeable)
+
+#if __GLASGOW_HASKELL__ < 802
+  import Data.Typeable (Typeable)
+#endif
 
 import Database.Orville.Internal.Types
 
@@ -12,7 +16,9 @@ data MigrationError
   = MigrationLockExcessiveRetryError String
   | MigrationExecutionError SchemaItem
                             SomeException
+#if __GLASGOW_HASKELL__ < 802
   deriving (Typeable)
+#endif
 
 instance Exception MigrationError
 
@@ -38,16 +44,16 @@ formatTableMigrationException tableDef exception = message
       "There was an error migrating table " ++
       name ++
       ".\n\
-                  \The error is:\n\
+                  The error is:\n\
                   \\n\
-                  \ " ++
+                   " ++
       displayException exception ++
       "\\n\
                   \\n\
                   \\n\
-                  \Here are the developer comments regarding the table:\n\
+                  Here are the developer comments regarding the table:\n\
                   \\n\
-                  \ " ++
+                   " ++
       comments ++
       "\
                   \\n"
