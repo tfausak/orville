@@ -7,7 +7,7 @@ License   : MIT
 
 module Database.Orville.Internal.QueryKey where
 
-#if 800 < __GLASGOW_HASKELL__ < 804
+#if 800 < __GLASGOW_HASKELL__
 import Data.Semigroup
 #endif
 

@@ -3,6 +3,7 @@ Module    : Database.Orville.Internal.MigrateSchema
 Copyright : Flipstone Technology Partners 2016-2018
 License   : MIT
 -}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 
 module Database.Orville.Internal.MigrateSchema
@@ -14,10 +15,16 @@ import Control.Concurrent (threadDelay)
 import qualified Control.Exception as Exc
 import Control.Monad
 import Control.Monad.Catch
-import Control.Monad.Fail (MonadFail)
+#if __GLASGOW_HASKELL__ < 804
+import Data.Semigroup
+#endif
+
+#if __GLASGOW_HASKELL__ > 800
+import Control.Monad.Fail
+#endif
+
 import Control.Monad.IO.Class
 import Data.Int
-import Data.Monoid
 import Data.String
 import Database.HDBC hiding (withTransaction)
 
@@ -60,7 +67,11 @@ waitForLockExpr =
 lockResult :: FromSql Bool
 lockResult = col ("result" :: String)
 
-withLockedTransaction :: (MonadFail m, MonadOrville conn m, MonadThrow m) => m a -> m a
+withLockedTransaction :: (MonadOrville conn m
+#if __GLASGOW_HASKELL__ > 800
+                         , MonadFail m
+#endif
+                         , MonadThrow m) => m a -> m a
 withLockedTransaction action = do
   go (0 :: Int)
   where
@@ -99,7 +110,11 @@ withLockedTransaction action = do
    explicitly states that the items are safe to drop. Column types may be changed,
    but will fail if the database cannot successfully make the request type change.
   -}
-migrateSchema :: (MonadFail m, MonadOrville conn m) => SchemaDefinition -> m ()
+migrateSchema :: ( MonadOrville conn m
+#if __GLASGOW_HASKELL__ > 800
+                 , MonadFail m
+#endif
+                 ) => SchemaDefinition -> m ()
 migrateSchema schemaDef =
   withConnection $ \conn -> do
     withLockedTransaction $ do
@@ -116,7 +131,11 @@ migrateSchema schemaDef =
    definition, Nothing will be returned.
  -}
 generateMigrationPlan ::
-     (MonadFail m, MonadOrville conn m) => SchemaDefinition -> m (Maybe MigrationPlan)
+     ( MonadOrville conn m
+#if __GLASGOW_HASKELL__ > 800
+     , MonadFail m
+#endif
+     ) => SchemaDefinition -> m (Maybe MigrationPlan)
 generateMigrationPlan schemaDef =
   withConnection $ \conn -> do
     withLockedTransaction $ do

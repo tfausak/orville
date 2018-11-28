@@ -3,6 +3,7 @@ Module    : Database.Orville.Internal.Monad
 Copyright : Flipstone Technology Partners 2016-2018
 License   : MIT
 -}
+{-# LANGUAGE CPP#-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE RankNTypes #-}
@@ -14,7 +15,9 @@ import Control.Applicative
 import Control.Monad.Base
 import Control.Monad.Catch (MonadCatch, MonadMask(..), MonadThrow)
 import Control.Monad.Except
+#if __GLASGOW_HASKELL__ > 800
 import Control.Monad.Fail
+#endif
 import Control.Monad.Reader (ReaderT(..), ask, local, mapReaderT, runReaderT)
 import Control.Monad.State (StateT, mapStateT)
 import Data.Pool
@@ -112,7 +115,9 @@ newtype OrvilleT conn m a = OrvilleT
              , MonadThrow
              , MonadCatch
              , MonadMask
+#if __GLASGOW_HASKELL__ > 800
              , MonadFail
+#endif
              )
 
 mapOrvilleT :: (m a -> n b) -> OrvilleT conn m a -> OrvilleT conn n b

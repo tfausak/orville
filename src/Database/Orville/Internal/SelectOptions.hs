@@ -8,14 +8,14 @@ License   : MIT
 
 module Database.Orville.Internal.SelectOptions where
 
-#if 800 < __GLASGOW_HASKELL__ < 804
+#if __GLASGOW_HASKELL__ < 804
 import Data.Semigroup (Semigroup((<>)))
 #endif
 
 import Data.Convertible
 import qualified Data.List as List
 import Data.Maybe
-#if 800 < __GLASGOW_HASKELL__
+#if __GLASGOW_HASKELL__ < 804
 import Data.Monoid hiding ((<>))
 #else
 import Data.Monoid

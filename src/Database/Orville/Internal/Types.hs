@@ -20,7 +20,7 @@ import qualified Data.List as List
 import Database.HDBC
 
 #if __GLASGOW_HASKELL__ < 802
-  import Data.Typeable
+import Data.Typeable
 #endif
 
 import qualified Data.Time as Time

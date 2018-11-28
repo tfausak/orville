@@ -6,8 +6,8 @@ module Database.Orville.Internal.MigrationError
 import Control.Exception (Exception, SomeException, displayException)
 import qualified Data.List as List
 
-#if __GLASGOW_HASKELL__ < 802
-  import Data.Typeable (Typeable)
+#if __GLASGOW_HASKELL__ < 800
+import Data.Typeable (Typeable)
 #endif
 
 import Database.Orville.Internal.Types
@@ -16,7 +16,7 @@ data MigrationError
   = MigrationLockExcessiveRetryError String
   | MigrationExecutionError SchemaItem
                             SomeException
-#if __GLASGOW_HASKELL__ < 802
+#if __GLASGOW_HASKELL__ < 800
   deriving (Typeable)
 #endif
 

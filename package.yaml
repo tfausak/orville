@@ -17,6 +17,7 @@ ghc-options:
   - -fno-warn-orphans
   - -fwarn-incomplete-uni-patterns
   - -fwarn-incomplete-record-updates
+
 dependencies:
   - base >=4.8 && <5
   - bytestring
@@ -37,6 +38,12 @@ dependencies:
   - transformers >=0.4
   - transformers-base >=0.4
   - unliftio-core >= 0.1
+
+when:
+  - condition: impl(ghc < 8.0.0)
+    dependencies:
+      - semigroups
+      - fail
 
 executables:
   orville-sample-exe:

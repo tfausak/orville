@@ -13,7 +13,7 @@ module Database.Orville.Internal.MigrationPlan
   , migrationPlanItems
   ) where
 
-#if 800 < __GLASGOW_HASKELL__ < 804
+#if __GLASGOW_HASKELL__ < 804
 import Data.Semigroup
 #endif
 
@@ -44,7 +44,7 @@ migrationPlanItems :: MigrationPlan -> [MigrationItem]
 migrationPlanItems (MigrationPlan item rest) =
   DList.toList $ DList.cons item rest
 
-#if 800 < __GLASGOW_HASKELL__
+#if __GLASGOW_HASKELL__ < 804
 instance Semigroup MigrationPlan where
   (<>) = append
 #endif

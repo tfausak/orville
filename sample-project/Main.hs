@@ -1,9 +1,12 @@
+{-# LANGUAGE CPP #-}
 module Main where
 
 import Control.Arrow
 import Control.Exception
 import Control.Monad (void)
+#if __GLASGOW_HASKELL__ > 800
 import Control.Monad.Fail
+#endif
 import Data.Convertible (convert)
 import qualified Data.Map.Strict as Map
 import Data.Text (pack, unpack)
@@ -280,7 +283,11 @@ getStudentsByMajorId = O.hasMany studentTable studentMajorField
 majorIdPopper :: O.Popper (Major MajorId) (MajorId)
 majorIdPopper = O.fromKern majorId
 
-resetToBlankSchema :: (MonadFail m, O.MonadOrville conn m) => O.SchemaDefinition -> m ()
+resetToBlankSchema :: ( O.MonadOrville conn m
+#if __GLASGOW_HASKELL__ > 800
+                      , MonadFail m
+#endif
+                      ) => O.SchemaDefinition -> m ()
 resetToBlankSchema schemaDef = do
   results <- ORaw.selectSqlRows "SELECT current_user" []
   case results of
